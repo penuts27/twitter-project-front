@@ -95,6 +95,11 @@ const routes = [
     component: AdminUsers,
     beforeEnter: authorizeIsAdmin
   },
+  {
+    path: '/publicroom',
+    name: 'public-room',
+    component: () => import('@/views/ChatRoomPublic.vue')
+  },
   // 首頁
   {
     path: '/main',
