@@ -10,6 +10,13 @@
         </router-link>
       </li>
       <li>
+        <router-link class="" to="/publicroom/">
+          <img v-if="this.$route.name === 'public-room'" class="icon" src="../assets/image/chat-message-active.svg" alt="">
+          <img v-else class="icon" src="../assets/image/chat-message.svg" alt="">
+          公開聊天室 
+        </router-link>     
+      </li>
+      <li>
         <router-link class="" :to="{ name: 'user-tweets', params: { id: currentUser.id }}">
           <img class="icon" v-if="this.$route.name === 'user-tweets' ||this.$route.name === 'user-likes'|| this.$route.name === 'user-replies' " src="../assets/image/icon_user2.png" alt="">
           <img v-else class="icon"  src="../assets/image/icon_user.png" alt="">
