@@ -26,7 +26,7 @@
         </div>
         <div class="chat-input-box">
             <input type="text" class="chat-input" placeholder="輸入訊息...">
-            <i></i>
+            <i><img src="../assets/image/arrow.svg" alt=""></i>
         </div>
     </div>
 </template>
@@ -78,11 +78,14 @@ export default {
             }
         }
         .chat-input-box{
+            display: flex;
+            align-items: center;
             flex: 0 0 auto;
             border-top: 1px solid $border;
             padding: 16px;
             .chat-input{
                 appearance: none;
+                flex: 1;
                 padding: 1px 15px;
                 background-color: $border;
                 border-style: none;
@@ -91,6 +94,11 @@ export default {
                 &::placeholder{
                     color: $middle-grey;
                 }
+            }
+            >i{
+                flex: 0 0 auto;
+                margin-left: 18px;
+                margin-right: 5px;
             }
         }
     }
