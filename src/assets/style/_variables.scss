@@ -1,0 +1,32 @@
+$primary: #F67599;
+$secondary: #222;
+$grey: #E5E5E5;
+$border:#E6ECF0; //調整
+$middle-grey: #9197A3;  //調整
+$dark-grey: #657786; //調整
+$light-grey:#F5F8FA; //調整
+$warring: #E0245E; //調整
+
+$white: #ffffff;
+$black: #1c1c1c; //調整
+$black2: #4A4A4A;
+// 改
+$primary:#FF6600;//調整
+$sizes: (
+    25: 25%,
+    50: 50%,
+    75: 75%,
+    100: 100%
+);
+$spacer: 16px;
+$spacers: (
+    0: 0,
+    1: ($spacer * 0.25), // 4px
+    2: ($spacer * 0.5),  // 8px
+    3: ($spacer * 0.75), // 12px
+    4: $spacer, // 16px
+    5: ($spacer * 1.25), // 20px
+    6: ($spacer * 1.5),  // 24px
+    7: ($spacer * 1.75), // 28px
+    8: ($spacer * 2),  // 32px
+)
