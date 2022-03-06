@@ -10,10 +10,10 @@
           <div class="online-user-card">
             <Avatar/>
             <div class="user-info">
-              <div class="name">apple</div>
-              <div class="account">apple</div>
+                <div class="name">apple</div>
+                <div class="account">apple</div>
             </div>
-          </div>
+        </div>
         </div>
         <div class="chat-room-box">
           <h2 class="title">公開聊天室</h2>
@@ -26,7 +26,7 @@
     </div>
   </div>
 </template>
-
+<script src="/socket.io/socket.io.js"></script>
 <script>
 import Navbar from "../components/Navbar.vue";
 import tweetApis from '../apis/tweet'
@@ -40,13 +40,21 @@ export default {
   components: {
     Navbar,
     Avatar,
-    ChatRoom
+    ChatRoom,
   },
   data() {
     return {
       tweets: []
     };
   },
+  // sockets: {
+  //   connect: function(){
+  //     console.log('socket connection')
+  //   },
+  //   customEmit: function(data){
+  //     console.log('this methods')
+  //   }
+  // },
   methods: {
     async afterCreateTweet(payload) {
       const {id, description} = payload
@@ -133,11 +141,15 @@ export default {
           title: '無取取得資料，請稍後再試'
         })
       }
-    }
-
+    },
+    // socketConnect(){
+    //   console.log(111)
+    //   this.$socket.emit('emit_method')
+    // }
   },
   created(){
     this.fetchTweets()
+    // this.socketConnect()
   },
   computed: {
           ...mapState(['currentUser'])
