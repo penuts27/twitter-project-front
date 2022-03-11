@@ -1,7 +1,7 @@
 <template>
     <div class="wrapper">
         <slot/>
-        <div class="chat-room" ref="chatroom">
+        <div class="chat-room scrollbar" ref="chatroom" >
             <div class="chat-content">
                 <!-- <h2 v-for="(mes, index) in messages" :key="index">{{mes}}</h2> -->
                 <PersonalMessage 
@@ -12,7 +12,8 @@
                 />
                 <!-- :type="message.type" -->
             </div>
-            <div class="chat-input-box">
+        </div>
+        <div class="chat-input-box">
                 <input type="text" v-model="text" class="chat-input" placeholder="輸入訊息...">
                 <i 
                 @click.stop.prevent="handleSend"
@@ -20,7 +21,6 @@
                     <img src="../assets/image/arrow.svg" alt="">
                 </i>
             </div>
-        </div>
     </div>
 </template>
 <script>
@@ -152,48 +152,64 @@ export default {
 </script>
 <style lang="scss" scoped>
     .wrapper{
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+        /* display: flex;
+        flex-direction: column; */
         border: 1px solid $border;
+        height: 100vh;
     }
     .chat-room{
+        /* flex: 1; */
         display: flex;
         flex-direction: column;
         // 減去head高度
-        height: calc(100vh - 73px);
+        height: 100%;
         overflow-y: scroll;
         .chat-content{
             flex: 1;
         }
-        .chat-input-box{
-            display: flex;
-            align-items: center;
+    }
+    .chat-input-box{
+        display: flex;
+        align-items: center;
+        flex: 0 0 auto;
+        border-top: 1px solid $border;
+        padding: 16px;
+        .chat-input{
+            appearance: none;
+            flex: 1;
+            padding: 1px 15px;
+            background-color: $border;
+            border-style: none;
+            border-radius: 500px;
+            @include font(16px, 26px ,normal, 400);
+            &::placeholder{
+                color: $middle-grey;
+            }
+        }
+        >i{
             flex: 0 0 auto;
-            border-top: 1px solid $border;
-            padding: 16px;
-            .chat-input{
-                appearance: none;
-                flex: 1;
-                padding: 1px 15px;
-                background-color: $border;
-                border-style: none;
-                border-radius: 500px;
-                @include font(16px, 26px ,normal, 400);
-                &::placeholder{
-                    color: $middle-grey;
-                }
-            }
-            >i{
-                flex: 0 0 auto;
-                padding-left: 18px;
-                padding-right: 5px;
-                cursor: pointer;
-            }
+            padding-left: 18px;
+            padding-right: 5px;
+            cursor: pointer;
         }
     }
     h2.title{
     padding: 24px;
     border-bottom: 1px solid $border;
     @include font(24px, 1, normal, 700);
-  }
+    }
+    .scrollbar {
+        // 拉回距離
+        padding-left: 6px;
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+        &::-webkit-scrollbar-thumb {
+            border-radius: 3px;
+            background-color: rgba(104, 104, 104, 0.1);
+        }
+        }
 </style>
