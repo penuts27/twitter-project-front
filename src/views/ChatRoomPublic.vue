@@ -7,20 +7,19 @@
       <main>
         <div class="user-list">
           <h2 class="title">上線使用者<span>(5)</span></h2>
-          <div class="online-user-card">
-            <Avatar/>
+          <div class="online-user-card" v-for="onlineUser in onlineUsers" :key="onlineUser.userId">
+            <Avatar :initImage="onlineUser.avatar" :initUserId="onlineUser.userId"/>
             <div class="user-info">
-                <div class="name">apple</div>
-                <div class="account">apple</div>
+                <div class="name">{{onlineUser.name}}</div>
+                <div class="account">{{onlineUser.account}}</div>
             </div>
         </div>
         </div>
-        <div class="chat-room-box">
-          <h2 class="title">公開聊天室</h2>
-          <div class="chat-content-box">
-            <ChatRoom/>
+          <div class="chat-room-box">
+            <ChatRoom :initMessages="messages" :initSocket="socket">
+              <h2 class="title">公開聊天室</h2>
+            </ChatRoom>
           </div>
-        </div>
       </main>
 
     </div>
@@ -34,9 +33,31 @@ import { Toast } from '../utils/helpers.js'
 import { mapState } from 'vuex'
 import Avatar from '../components/Avatar.vue'
 import ChatRoom from '../components/ChateRoom.vue'
+import { io } from "socket.io-client";
+
+// const dummyData = [
+//   {
+//     userId: 274,
+//     avatar: 'https://gravatar.com/avatar/7171d4a3173dbc64468bbb0ac241ec8d?s=400&d=robohash&r=x',
+//     name: 'robot1',
+//     account: 'robot1'
+//   },
+//   {
+//     userId: 275,
+//     avatar: 'https://gravatar.com/avatar/8e92f23f6d7f67cb0e00edfbba39d02f?s=400&d=robohash&r=x',
+//     name: 'robot2',
+//     account: 'robot2'
+//   },
+//   {
+//     userId: 276,
+//     avatar: 'https://gravatar.com/avatar/78470cf2ae4b1d25cbda7950389b06d2?s=400&d=robohash&r=x',
+//     name: 'robot3',
+//     account: 'robot3'
+//   }
+// ]
 
 export default {
-  name: 'Main',
+  name: 'ChateRoomPublic',
   components: {
     Navbar,
     Avatar,
@@ -44,52 +65,13 @@ export default {
   },
   data() {
     return {
-      tweets: []
+      tweets: [],
+      onlineUsers: [],
+      messages: [],
+      socket: null
     };
   },
-  // sockets: {
-  //   connect: function(){
-  //     console.log('socket connection')
-  //   },
-  //   customEmit: function(data){
-  //     console.log('this methods')
-  //   }
-  // },
   methods: {
-    async afterCreateTweet(payload) {
-      const {id, description} = payload
-      // 回傳前端假tweet物件
-      const result = {
-          id,
-          UserId: this.currentUser.id,
-          description,
-          // TODO:優化
-          createdAt: new Date(),
-          likeCount: 0,
-          replyCount: 0,
-          User: {
-            name: this.currentUser.name,
-            account: this.currentUser.account ? this.currentUser.account : '找不到帳戶',
-            avatar: this.currentUser.avatar,
-          },
-      }
-      try{
-        // 前端手動更新
-        this.tweets.unshift(result) 
-        // post請求
-        const {statusText} = await tweetApis.createTweet(result)
-        if(statusText !== 'OK'){
-          throw new Error(statusText)
-        }
-
-      }catch(error){
-        console.log('error', error)
-        Toast.fire({
-          icon: 'error',
-          title: '無法新增推文，請稍後再試'
-        })
-      }
-    },
     // 接收navbar推文資料///
     afterCreateTweetFromNavbar(fromNavbar){
       // console.log('receive from navbar', fromNavbar)
@@ -141,18 +123,40 @@ export default {
           title: '無取取得資料，請稍後再試'
         })
       }
-    },
-    // socketConnect(){
-    //   console.log(111)
-    //   this.$socket.emit('emit_method')
-    // }
+    }
   },
   created(){
     this.fetchTweets()
-    // this.socketConnect()
   },
+  mounted(){
+        const getToken = () => localStorage.getItem('token')
+        const socket = io("https://sheltered-ravine-31386.herokuapp.com/",{
+            auth: {
+                token: getToken()
+            }
+        });
+        
+        this.socket = socket 
+
+        // // 進入聊天室時，會收到之前的全部訊息，並更新到 messages
+        // this.socket.on('all messages', data => {
+        //     this.messages = data
+        // })
+        
+        // 設定接收到新訊息的監聽器
+        // socket持續接收server回傳資訊
+        this.socket.on('userList', data => {
+          console.log('@',data)
+          this.onlineUsers = data
+        })
+        this.socket.on('chat message', obj => {
+          console.log('$', obj)
+            // message傳給子組件
+            this.messages.push(obj)
+        })
+    },
   computed: {
-          ...mapState(['currentUser'])
+        ...mapState(['currentUser'])
    }
 };
 </script>
@@ -192,13 +196,7 @@ main {
     border: 1px solid $border;
   }
   .chat-room-box{
-    display: flex;
-    flex-direction: column;
     width: 60%;
-    border: 1px solid $border;
-    .chat-content-box{
-      height: 100%;
-    }
   }
   .online-user-card{
     display: grid;

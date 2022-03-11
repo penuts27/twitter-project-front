@@ -1,19 +1,24 @@
 <template>
-    <div :class="['personal-message', {'self': isSelfUser}]">
-        <div class="avatar-box">
-            <Avatar :initImage="initMessage.avatar" :initUserId="initMessage.userId"/>
+    <div>
+        <div :class="['personal-message', {'self': isSelfUser}]" v-if="type === 'chat'">
+            <div class="avatar-box">
+                <Avatar :initImage="initMessage.avatar" :initUserId="initMessage.userId"/>
+            </div>
+            <div class="talk-box">
+                <div class="talk">
+                {{initMessage.content}}
+            </div>
+            <div class="createdAt">{{initMessage.createdTime | timeFormate}}</div>
+            </div>
         </div>
-        <div class="talk-box">
-            <div class="talk">
-            {{initMessage.content}}
-        </div>
-        <div class="createdAt">{{initMessage.createdAt}}</div>
-        </div>
+        <h2 class="small" v-else-if="type === 'here'">{{initMessage.person}}{{initMessage.isHere === true ? '已加入' : '已離開'}}</h2>
     </div>
 </template>
 
 <script>
 import Avatar from '../../components/Avatar.vue'
+import moment from 'moment'
+
 export default {
     components: {
         Avatar
@@ -25,13 +30,33 @@ export default {
         },
         initMessage: {
             type: Object,
-            require: true
+            required: true
+        },
+        type: {
+            type: String,
+            default: 'chat'
         }
-    }
+    },
+    filters:{
+        timeFormate(datetime){
+            // 若值不存在返回
+            if(!datetime) return '-'
+
+            // 若格式不符返回
+            if(moment(datetime).isValid === false) return '-'
+            // const AMPM = moment(datetime).format('A') === 'AM' ? '上午' : '下午'
+            // TODO:AM換成中文
+            return moment(datetime).format('A HH:mm')
+        }
+    },
 }
 </script>
 
 <style lang="scss" scoped>
+@import '../../assets/style/_variables.scss';
+@import '../../assets/style/_reset.scss';
+@import '../../assets/style/_base.scss';
+@import '../../assets/style/_mixin.scss';
 .personal-message{
     display: grid;
     grid-template-columns: 40px auto;
@@ -69,5 +94,15 @@ export default {
         color: $dark-grey;
         @include font (13px, 1, normal, 400);
     }
+}
+.small{
+    margin: 0 auto;
+    width: fit-content;
+    padding: 7px 14px;
+    background-color: $grey;
+    color: $dark-grey;
+    border-radius: 500px;
+    text-align: center;
+    @include font(15px, 1, normal ,500);
 }
 </style>

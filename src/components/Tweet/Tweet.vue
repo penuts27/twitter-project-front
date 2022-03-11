@@ -213,6 +213,7 @@ export default {
         padding: 15px;
         background-color: $white;
         border-bottom: 1px solid $border;
+        max-width: 100%;
         .avatar-box{
             height: 50px;
         }
@@ -267,6 +268,7 @@ export default {
         .tweet-content{
             margin-bottom: 15px;
             @include font (15px, 1.5, normal, 500);
+            word-break: break-all;
         }
         .reaction{
             display: flex;

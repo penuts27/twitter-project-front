@@ -1,18 +1,25 @@
 <template>
-    <div class="chat-room">
-        <div class="chat-content">
-            <PersonalMessage 
-            v-for="message in messages" 
-            :key="message.id"
-            :initMessage="message"
-            :isSelfUser="currentUser.id === message.userId"
-            />
-            <h2>其他訊息</h2>
-            <!-- <PersonalMessage :isSelfUser="true"/> -->
-        </div>
-        <div class="chat-input-box">
-            <input type="text" v-model="text" class="chat-input" placeholder="輸入訊息...">
-            <i @click.stop.prevent="handleSend"><img src="../assets/image/arrow.svg" alt=""></i>
+    <div class="wrapper">
+        <slot/>
+        <div class="chat-room" ref="chatroom">
+            <div class="chat-content">
+                <!-- <h2 v-for="(mes, index) in messages" :key="index">{{mes}}</h2> -->
+                <PersonalMessage 
+                v-for="(message, index) in messages" 
+                :key="index"
+                :initMessage="message"
+                :isSelfUser="currentUser.id === message.userId"
+                />
+                <!-- :type="message.type" -->
+            </div>
+            <div class="chat-input-box">
+                <input type="text" v-model="text" class="chat-input" placeholder="輸入訊息...">
+                <i 
+                @click.stop.prevent="handleSend"
+                >
+                    <img src="../assets/image/arrow.svg" alt="">
+                </i>
+            </div>
         </div>
     </div>
 </template>
@@ -20,10 +27,14 @@
 import PersonalMessage from '../components/Card/PersonalMessage.vue'
 import {mapState} from 'vuex'
 
-const dummyData = [
+const dummyData2 = [
 {
-    type: 'enter',
-    person: 'will'
+    type: 'here',
+    isHere: true,
+    userId: 274,
+    avatar: 'https://gravatar.com/avatar/7171d4a3173dbc64468bbb0ac241ec8d?s=400&d=robohash&r=x',
+    name: 'robot1',
+    account: 'robot1'
 },
 {
     type: 'chat',
@@ -34,6 +45,13 @@ const dummyData = [
     content: '你好啊',
     createdAt: '下午9:39',
 },{
+    type: 'here',
+    isHere: false,
+    avatar: 'https://gravatar.com/avatar/7171d4a3173dbc64468bbb0ac241ec8d?s=400&d=robohash&r=x',
+    name: 'robot1',
+    account: 'robot1'
+},
+{
     type: 'chat',
     avatar: 'https://gravatar.com/avatar/8e92f23f6d7f67cb0e00edfbba39d02f?s=400&d=robohash&r=x',
     name: 'robot2',
@@ -52,47 +70,98 @@ const dummyData = [
     createdAt: '下午9:41',
 }]
 
+
 export default {
     components: {
         PersonalMessage
     },
+    props: {
+      initMessages: {
+          type: Array,
+          default: () => {
+              return []
+          }
+      },
+      initSocket: {
+          type: Object,
+          required: false
+      }
+    },
     data(){
         return {
             messages: [],
-            text: ''
+            text: '',
         }
     },
     methods: {
         handleSend(){
+            if(!this.initSocket) return
             if (this.text.trim()) {
                 // 通道名稱為chat message
-                this.$socket.emit('chat message', {
-                    msg: this.text
+                this.initSocket.emit('chat message', {
+                    msg: this.text,
+                    userId: this.currentUser.id,
+
                 })
                 this.text= ""
+                // {
+                //     msg: this.text,
+                //     userId: currentUser.id
+                // }
             }
         },
         fetchData(){
-            this.messages = dummyData
+            this.messages = dummyData2
         }
     },
     created(){
-        this.fetchData()
+        // this.fetchData()
+    },
+    // 當props值須隨即監控時使用
+    watch:{
+        initMessages(newValue){
+            this.messages = {
+                ...this.messages,
+                ...newValue
+            }
+            // $nextTick會再dom掛載，渲染之後執行function
+            this.$nextTick(function(){
+                const roomContainer = this.$refs.chatroom
+                roomContainer.scrollTop = roomContainer.scrollHeight
+            })
+        }
+    },
+    mounted(){
+        window.addEventListener('keyup', event => {
+            if(event.keyCode === 13){
+                this.handleSend()
+            }
+        })
+        // // 進入聊天室時，會收到之前的全部訊息，並更新到 messages
+        // this.socket.on('all messages', data => {
+        //     this.messages = data
+        // })
+        
+        // 設定接收到新訊息的監聽器
     },
     computed: {
         ...mapState(['currentUser']),
-        // isMe(){
-        //     return this.currentUser.id === 
-        // }
     }
     
 }
 </script>
 <style lang="scss" scoped>
+    .wrapper{
+        display: flex;
+        flex-direction: column;
+        border: 1px solid $border;
+    }
     .chat-room{
         display: flex;
         flex-direction: column;
-        height: 100%;
+        // 減去head高度
+        height: calc(100vh - 73px);
+        overflow-y: scroll;
         .chat-content{
             flex: 1;
         }
@@ -122,4 +191,9 @@ export default {
             }
         }
     }
+    h2.title{
+    padding: 24px;
+    border-bottom: 1px solid $border;
+    @include font(24px, 1, normal, 700);
+  }
 </style>
