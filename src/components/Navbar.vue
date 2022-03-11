@@ -90,7 +90,7 @@ import NewTweet from "./../components/NewTweet";
   width: 240px;
   height: 100%;
   /* position: absolute; */
-  right: 40px;
+  /* right: 40px; */
   // will
   position: relative;
   min-height: 100vh;

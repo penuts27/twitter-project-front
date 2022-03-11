@@ -52,6 +52,8 @@ export default {
         async fetchUsers(){
             try{
                 const {data, statusText} = await userApi.getUsersTop()
+
+                
                 // console.log('@@', data)
 
                 if(statusText !== 'OK'){
